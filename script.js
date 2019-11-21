@@ -1,9 +1,11 @@
-const apiKey = 'g1iC5cphPQEWGeoKWzidykfGFvolnhqCVpSPTFIV';
+const apiKey = 'api_key=g1iC5cphPQEWGeoKWzidykfGFvolnhqCVpSPTFIV';
+let hasitRun = false;
 
 function getRepos() {
-    let username = document.getElementById("user").value;
-    let link = 'https://api.github.com/users/' + username + '/repos';
-    $('#repoStage').empty();
+    let states = document.getElementById("states").value;
+    let amt = document.getElementById('park-amount').value;
+    let link = 'https://developer.nps.gov/api/v1/parks?stateCode=' + states + '&' + apiKey + '&limit=' + amt;
+    $('#parkStage').empty();
     $('#errorMsg').empty();
     fetch(link)
         .then(response => {
@@ -13,18 +15,20 @@ function getRepos() {
             throw new Error(response.statusText);
         })
         .then(responseJson =>
-            showRepos(responseJson, username))
+            showRepos(responseJson, states, amt))
         .catch(error => {
             $('#errorMsg').text(`Something went wrong: ${error.message}`);
         });
     $('.results').removeClass('hidden');
 }
 
-function showRepos(responseJson, username) {
-    $('#repoStage').append(`<h2> Here are all of ${username}'s repos</h2>
-     <ul id="repoList"></ul>`);
-    for (let i = responseJson.length - 1; i > 0; i--) {
-        $('#repoList').append(`<li>${responseJson[i].name} -- <a href="${responseJson[i].html_url}" target="_blank">link</a> </li>`);
+function showRepos(responseJson, states, amt) {
+    $('#parkStage').append(`<h2> Here's the ${amt} park(s) from ${states}</h2>
+     <ul id="parkList"></ul>`);
+    console.log(responseJson);
+    for (let i = 0; i < responseJson.data.length; i++) {
+        console.log(responseJson.data[i].name);
+        $('#parkList').append(`<li>${responseJson.data[i].name}:<br>${responseJson.data[i].description}<br><a href="${responseJson.data[i].url} target="_blank"">Visit the website!</a></li><br>`);
     }
 }
 
